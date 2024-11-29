@@ -30,16 +30,21 @@ router.post('/register', async (req, res) => {
 // Login route
 router.post('/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
+    // Sanitize user input
+    const sanitizedUsername = sanitize(req.body.username);
+    const sanitizedPassword = sanitize(req.body.password);
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      res.status(200).json({ message: 'Login successful!' });
-    } else {
-      res.status(401).json({ message: 'Invalid credentials' });
+    // Use parameterized query for secure lookup
+    const user = await User.findOne({ username: sanitizedUsername });
+
+    if (user && (await bcrypt.compare(sanitizedPassword, user.password))) {
+      return res.status(200).json({ message: 'Login successful!' });
     }
+
+    res.status(401).json({ message: 'Invalid username or password.' });
   } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Internal server error.' });
   }
 });
 

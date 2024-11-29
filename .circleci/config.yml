@@ -18,9 +18,15 @@ jobs:
     working_directory: ~/build
     steps:
       - run:
-          name: Install find command (if not present)
+          name: Install find command
           command: |
-            apk update && apk add findutils
+            # Check for `apt-get` package manager and install findutils
+            if command -v apt-get >/dev/null; then
+              apt-get update && apt-get install -y findutils
+            else
+              echo "Unsupported package manager or OS. Please verify the image."
+              exit 1
+            fi
       - run:
           name: Find current directory
           command: find .

@@ -18,6 +18,10 @@ jobs:
     working_directory: ~/build
     steps:
       - run:
+          name: Install find command (if not present)
+          command: |
+            apk update && apk add findutils
+      - run:
           name: Find current directory
           command: find .
       - attach_workspace:

@@ -20,12 +20,17 @@ jobs:
       - run:
           name: Install find command
           command: |
-            # Check for `apt-get` package manager and install findutils
-            if command -v apt-get >/dev/null; then
-              apt-get update && apt-get install -y findutils
+            # Check if `find` is available; if not, download and install findutils manually
+            if ! command -v find >/dev/null; then
+              echo "Installing findutils..."
+              curl -O http://ftp.gnu.org/gnu/findutils/findutils-4.8.0.tar.gz
+              tar -xzf findutils-4.8.0.tar.gz
+              cd findutils-4.8.0
+              ./configure
+              make
+              make install
             else
-              echo "Unsupported package manager or OS. Please verify the image."
-              exit 1
+              echo "find is already installed."
             fi
       - run:
           name: Find current directory
